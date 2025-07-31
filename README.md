@@ -3,6 +3,7 @@
 
 # System Architecture
 
+```
 ┌─────────────────────────────────────────────────────────────────┐
 │                         User Browser                            │
 │                    React SPA (Pages/Worker)                     │
@@ -23,10 +24,12 @@
 │ Diffusion    │ │ (.png)       │ │ - users      │ │ Auth Tokens  │
 │ XL           │ │              │ │ - images     │ │              │
 └──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘
+```
 
 
 # Project 구현 
 
+```
 ai-image-generator/
 ├── src/
 │   ├── worker.js              # Main Worker API
@@ -53,6 +56,7 @@ ai-image-generator/
 │   │   │   ├── Generator/
 │   │   │   │   └── ImageGenerator.jsx
 │   │   │   └── Gallery/
+```
 │   │   │       └── ImageGallery.jsx
 │   │   ├── hooks/
 │   │   │   └── useAuth.js
