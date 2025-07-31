@@ -56,7 +56,6 @@ ai-image-generator/
 │   │   │   ├── Generator/
 │   │   │   │   └── ImageGenerator.jsx
 │   │   │   └── Gallery/
-```
 │   │   │       └── ImageGallery.jsx
 │   │   ├── hooks/
 │   │   │   └── useAuth.js
@@ -71,6 +70,7 @@ ai-image-generator/
 ├── schema.sql                
 ├── package.json              
 └── README.md
+```
 
 # AI Image Generator with Authentication
 
