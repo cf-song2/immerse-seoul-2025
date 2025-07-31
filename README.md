@@ -27,7 +27,7 @@
 ```
 
 
-# Project 구현 
+# Project Tree 
 
 ```
 ai-image-generator/
@@ -93,10 +93,13 @@ A full-stack AI image generation application built with Cloudflare Workers, Work
 - Cloudflare account
 - Wrangler CLI installed
 
-### Installation
+## Installation
+
+```bash
 make install
 make db-init
 make secrets
 
 make init-pages
 make deploy-pages
+```
