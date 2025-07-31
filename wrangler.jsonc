@@ -1,47 +1,50 @@
-/**
- * For more details on how to configure Wrangler, refer to:
- * https://developers.cloudflare.com/workers/wrangler/configuration/
- */
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "immerse-seoul",
-	"main": "src/index.js",
-	"compatibility_date": "2025-07-22",
-	"observability": {
-		"enabled": true
-	}
-	/**
-	 * Smart Placement
-	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
-	 */
-	// "placement": { "mode": "smart" },
+  "$schema": "node_modules/wrangler/config-schema.json",
 
-	/**
-	 * Bindings
-	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
-	 * databases, object storage, AI inference, real-time communication and more.
-	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
-	 */
+  "name": "immerse-seoul",
+  "main": "src/workers.js",
+  "compatibility_date": "2025-07-22",
+  "observability": { "enabled": true },
 
-	/**
-	 * Environment Variables
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
-	 */
-	// "vars": { "MY_VARIABLE": "production_value" },
-	/**
-	 * Note: Use secrets to store sensitive data.
-	 * https://developers.cloudflare.com/workers/configuration/secrets/
-	 */
+  // ---- Bindings ----
+  "ai": { "binding": "AI" },
 
-	/**
-	 * Static Assets
-	 * https://developers.cloudflare.com/workers/static-assets/binding/
-	 */
-	// "assets": { "directory": "./public/", "binding": "ASSETS" },
+  "r2_buckets": [
+    {
+      "binding": "IMAGES_BUCKET",
+      "bucket_name": "ai-generated-images-auth"
+    }
+  ],
 
-	/**
-	 * Service Bindings (communicate between multiple Workers)
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
-	 */
-	// "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "image-metadata-auth",
+      "database_id": "a6b7f38c-64ee-46d0-be85-d175fb527ad0"
+    }
+  ],
+
+  // KV
+  "kv_namespaces": [
+    {
+      "binding": "SESSIONS",
+      "id": "ef3320e528484969b45db31c06153906"
+    }
+  ],
+
+  "vars": {
+    "SESSION_DURATION": "86400",
+    "DAILY_IMAGE_LIMIT": "10",
+    "ENVIRONMENT": "production",
+    "RESEND_API_KEY": "",
+    "EMAIL_FROM": "onboarding@resend.dev"
+  },
+
+  // Custom domain routing
+  "routes": [
+    {
+      "pattern": "immerse-seoul-api.metamon.shop/*",
+      "zone_name": "metamon.shop"
+    }
+  ]
 }
