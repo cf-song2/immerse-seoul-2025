@@ -3,31 +3,100 @@
 
 # System Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         User Browser                            │
-│                    React SPA (Pages/Worker)                     │
-└───────────────┬────────────────┬────────────┬───────────────────┘
-                │                │            │
-                ▼                ▼            ▼
-┌───────────────────────────────────────────────────────────────┐
-│                    Cloudflare Workers API                     │
-│  /api/auth/register    /api/auth/login    /api/auth/logout    │
-│  /api/auth/verify      /api/generate      /api/images         │
-└──────┬──────────────┬──────────────────┬──────────┬───────────┘
-       │              │                  │          │
-       ▼              ▼                  ▼          ▼
-┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
-│ Workers AI   │ │   R2 Bucket  │ │ D1 Database  │ │   KV Store   │
-│              │ │              │ │              │ │              │
-│ Stable       │ │ Image Files  │ │ Tables:      │ │ Sessions     │
-│ Diffusion    │ │ (.png)       │ │ - users      │ │ Auth Tokens  │
-│ XL           │ │              │ │ - images     │ │              │
-└──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘
+```mermaid
+flowchart TD
+    Browser["User Browser\nReact SPA (Pages/Worker)"] --> WorkerAPI
+    
+    subgraph WorkerAPI["Cloudflare Workers API"]
+        Register["/api/auth/register"] 
+        Login["/api/auth/login"]
+        Logout["/api/auth/logout"]
+        Verify["/api/auth/verify"]
+        Generate["/api/generate"]
+        Images["/api/images"]
+    end
+    
+    WorkerAPI --> WorkersAI
+    WorkerAPI --> R2
+    WorkerAPI --> D1
+    WorkerAPI --> KV
+    
+    subgraph WorkersAI["Workers AI"]
+        SDXL["Stable Diffusion XL"]    
+    end
+    
+    subgraph R2["R2 Bucket"]
+        ImageFiles["Image Files (.png)"]    
+    end
+    
+    subgraph D1["D1 Database"]
+        Users["users"]    
+        Images2["images"]    
+    end
+    
+    subgraph KV["KV Store"]
+        Sessions["Sessions"]
+        AuthTokens["Auth Tokens"]    
+    end
 ```
 
 
 # Project Tree 
+
+```mermaid
+graph TD
+    root["ai-image-generator/"] --> src
+    root --> pages-app
+    root --> wrangler["wrangler.toml"]
+    root --> schema["schema.sql"]
+    root --> package["package.json"]
+    root --> readme["README.md"]
+    
+    src --> worker["worker.js: Main Worker API"]
+    src --> auth
+    src --> handlers
+    src --> utils
+    
+    auth --> auth_js["auth.js: 인증 로직"]
+    auth --> jwt["jwt.js: JWT 토큰 처리"]
+    auth --> middleware["middleware.js: 인증 미들웨어"]
+    
+    handlers --> images_js["images.js: 이미지 관련 핸들러"]
+    handlers --> users_js["users.js: 사용자 관련 핸들러"]
+    
+    utils --> crypto["crypto.js: 암호화 유틸"]
+    utils --> response["response.js: 응답 헬퍼"]
+    
+    pages-app --> pages_src["src/"]
+    pages-app --> public["public/"]
+    pages-app --> pages_package["package.json"]
+    pages-app --> vite["vite.config.js"]
+    pages-app --> tailwind["tailwind.config.js"]
+    pages-app --> postcss["postcss.config.js"]
+    
+    pages_src --> App["App.jsx"]
+    pages_src --> main["main.jsx"]
+    pages_src --> index_css["index.css"]
+    pages_src --> components
+    pages_src --> hooks
+    pages_src --> services
+    
+    components --> Auth
+    components --> Generator
+    components --> Gallery
+    
+    Auth --> Login["Login.jsx"]
+    Auth --> Register["Register.jsx"]
+    Auth --> AuthGuard["AuthGuard.jsx"]
+    
+    Generator --> ImageGenerator["ImageGenerator.jsx"]
+    Gallery --> ImageGallery["ImageGallery.jsx"]
+    
+    hooks --> useAuth["useAuth.js"]
+    services --> api["api.js"]
+```
+
+You can also view the directory structure in text format:
 
 ```
 ai-image-generator/
