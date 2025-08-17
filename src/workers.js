@@ -1,7 +1,7 @@
 // Main Worker entry point
 
 import { requireAuth } from './auth/middleware.js';
-import { handleRegister, handleLogin, handleLogout, handleVerifyAuth } from './auth/auth.js';
+import { handleRegister, handleLogin, handleLogout, handleVerifyAuth, handleVerifyEmail } from './auth/auth.js';
 import { handleLegacyLogin, handleLegacyLoginOptions } from './auth/legacy-auth.js';
 import { 
   handleImageGeneration, 
@@ -38,6 +38,8 @@ export default {
         return await handleGetPublicImages(env);
       } else if (url.pathname.startsWith('/api/image/') && request.method === 'GET') {
         return await handleGetImage(request, url.pathname, env);
+      } else if (url.pathname === '/api/auth/verify-email' && request.method === 'GET') {
+        return await handleVerifyEmail(request, env);
       }
 
       if (url.pathname === '/api/test' && request.method === 'GET') {

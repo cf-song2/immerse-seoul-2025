@@ -40,12 +40,21 @@ export async function handleRegister(request, env) {
     const verificationToken = generateToken();
 
     console.log('Generated userId:', userId);
+    console.log('Generated verificationToken:', verificationToken);
+    console.log('Generated verificationToken length:', verificationToken.length);
+    console.log('Environment:', env.ENVIRONMENT);
+    console.log('Database binding available:', !!env.DB);
 
     try {
       await env.DB.prepare(
         'INSERT INTO users (id, email, password_hash, username, is_verified, verification_token) VALUES (?, ?, ?, ?, 0, ?)'
       ).bind(userId, email, passwordHash, username, verificationToken).run();
       console.log('User created successfully');
+      
+      // Verify the token was stored correctly
+      const storedUser = await env.DB.prepare('SELECT verification_token FROM users WHERE id = ?').bind(userId).first();
+      console.log('Token stored in database:', storedUser?.verification_token);
+      console.log('Token match:', storedUser?.verification_token === verificationToken);
     } catch (insertError) {
       console.error('Error inserting user:', insertError);
       throw insertError;
@@ -58,10 +67,13 @@ export async function handleRegister(request, env) {
 
     // Send verification email
     try {
+      console.log('Sending verification email with token:', verificationToken);
       const { sendVerificationEmail } = await import('../utils/email.js');
       const emailSent = await sendVerificationEmail(email, verificationToken, env);
       if (!emailSent) {
         console.error('Failed to send verification email');
+      } else {
+        console.log('Verification email sent successfully');
       }
     } catch (emailErr) {
       console.error('Error sending verification email:', emailErr);
@@ -145,16 +157,35 @@ export async function handleVerifyEmail(request, env) {
   try {
     const url = new URL(request.url);
     const token = url.searchParams.get('token');
+    console.log('Verification attempt - Token from URL:', token);
+    
     if (!token) {
       return errorResponse('Missing token', 400, headers);
     }
-    const user = await env.DB.prepare('SELECT id FROM users WHERE verification_token = ?').bind(token).first();
+
+    // Debug: Check all tokens in database
+    const allTokens = await env.DB.prepare('SELECT email, verification_token FROM users WHERE verification_token IS NOT NULL').all();
+    console.log('All verification tokens in database:', allTokens.results);
+
+    const user = await env.DB.prepare('SELECT id, email FROM users WHERE verification_token = ?').bind(token).first();
+    console.log('User found for token:', user);
+    
     if (!user) {
       return errorResponse('Invalid or expired token', 400, headers);
     }
-    await env.DB.prepare('UPDATE users SET is_verified = 1, verification_token = NULL WHERE id = ?').bind(user.id).run();
-    return jsonResponse({ success: true, message: 'Email verified. You can now log in.' }, 200, headers);
+    
+    const updateResult = await env.DB.prepare('UPDATE users SET is_verified = 1, verification_token = NULL WHERE id = ?').bind(user.id).run();
+    console.log('Update result:', updateResult);
+    
+    // Return JSON success response (let frontend handle redirect)
+    return jsonResponse({ 
+      success: true, 
+      message: 'Email verified successfully! You can now log in.',
+      redirect: 'https://immerse-seoul.metamon.shop/login?verified=true'
+    }, 200, headers);
   } catch (error) {
+    console.error('Email verification error:', error);
+    // Return JSON error response
     return errorResponse('Email verification failed', 500, headers);
   }
 }

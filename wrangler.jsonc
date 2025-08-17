@@ -36,7 +36,6 @@
     "SESSION_DURATION": "86400",
     "DAILY_IMAGE_LIMIT": "10",
     "ENVIRONMENT": "production",
-    "RESEND_API_KEY": "",
     "EMAIL_FROM": "onboarding@resend.dev"
   },
 

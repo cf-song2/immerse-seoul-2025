@@ -44,6 +44,10 @@ export async function handleImageGeneration(request, env, ctx) {
       height,
       num_steps: 20,
       guidance: 7.5,
+    }, {
+      gateway: {
+        id: "immerse-gateway"
+      }
     });
 
     console.log('AI response type:', typeof response);
@@ -53,46 +57,70 @@ export async function handleImageGeneration(request, env, ctx) {
     const imageId = crypto.randomUUID();
     const filename = `${request.user.id}/${imageId}.png`;
     
-    let imageStream;
+    let imageData;
     if (response instanceof ReadableStream) {
-      console.log('Response is ReadableStream');
-      imageStream = response;
+      console.log('Response is ReadableStream - converting to Uint8Array for R2 upload');
+      // Convert ReadableStream to Uint8Array for direct R2 upload
+      const reader = response.getReader();
+      const chunks = [];
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+      }
+      const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+      const imageBuffer = new Uint8Array(totalLength);
+      let offset = 0;
+      for (const chunk of chunks) {
+        imageBuffer.set(chunk, offset);
+        offset += chunk.length;
+      }
+      console.log('Converted ReadableStream to Uint8Array, size:', imageBuffer.length);
+      imageData = imageBuffer;
     } else if (response.image instanceof ReadableStream) {
-      console.log('Response.image is ReadableStream');
-      imageStream = response.image;
+      console.log('Response.image is ReadableStream - converting to Uint8Array for R2 upload');
+      // Convert ReadableStream to Uint8Array for direct R2 upload
+      const reader = response.image.getReader();
+      const chunks = [];
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+      }
+      const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+      const imageBuffer = new Uint8Array(totalLength);
+      let offset = 0;
+      for (const chunk of chunks) {
+        imageBuffer.set(chunk, offset);
+        offset += chunk.length;
+      }
+      console.log('Converted response.image ReadableStream to Uint8Array, size:', imageBuffer.length);
+      imageData = imageBuffer;
     } else {
       // Fallback: handle Uint8Array, ArrayBuffer, base64 string as before
-      let imageBuffer;
       if (response instanceof Uint8Array) {
-        imageBuffer = response;
+        imageData = response;
       } else if (response instanceof ArrayBuffer) {
-        imageBuffer = new Uint8Array(response);
+        imageData = new Uint8Array(response);
       } else if (response.image) {
         if (typeof response.image === 'string') {
           const binaryString = atob(response.image);
-          imageBuffer = Uint8Array.from(binaryString, (char) => char.charCodeAt(0));
+          imageData = Uint8Array.from(binaryString, (char) => char.charCodeAt(0));
         } else if (response.image instanceof Uint8Array) {
-          imageBuffer = response.image;
+          imageData = response.image;
         } else if (response.image instanceof ArrayBuffer) {
-          imageBuffer = new Uint8Array(response.image);
+          imageData = new Uint8Array(response.image);
         }
       } else if (typeof response === 'string') {
         const binaryString = atob(response);
-        imageBuffer = Uint8Array.from(binaryString, (char) => char.charCodeAt(0));
+        imageData = Uint8Array.from(binaryString, (char) => char.charCodeAt(0));
       } else {
         throw new Error('Unknown response format');
       }
-      // Convert buffer to stream
-      imageStream = new ReadableStream({
-        start(controller) {
-          controller.enqueue(imageBuffer);
-          controller.close();
-        }
-      });
     }
 
-    // Save to R2
-    await env.IMAGES_BUCKET.put(filename, imageStream, {
+    // Save to R2 - pass Uint8Array directly instead of stream
+    await env.IMAGES_BUCKET.put(filename, imageData, {
       httpMetadata: {
         contentType: 'image/png',
       },

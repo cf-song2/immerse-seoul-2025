@@ -6,6 +6,7 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import LegacyLogin from './components/Auth/LegacyLogin';
 import LegacyLoginSuccess from './components/Auth/LegacyLoginSuccess';
+import EmailVerify from './components/Auth/EmailVerify';
 import ImageGenerator from './components/Generator/ImageGenerator';
 import ImageGallery from './components/Gallery/ImageGallery';
 
@@ -159,6 +160,7 @@ function AppContent() {
             </div>
           } />
           <Route path="/gallery/:viewMode" element={<GalleryPage />} />
+          <Route path="/verify" element={<EmailVerify />} />
           <Route path="/legacy-login" element={
             <div className="max-w-2xl mx-auto">
               <div className="bg-white rounded-lg shadow-sm p-8">
