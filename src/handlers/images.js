@@ -31,7 +31,11 @@ export async function handleImageGeneration(request, env, ctx) {
     }
 
     if (dailyCount >= parseInt(env.DAILY_IMAGE_LIMIT)) {
-      return errorResponse(`Daily limit of ${env.DAILY_IMAGE_LIMIT} images reached`, 429, headers);
+      return jsonResponse({
+        error: `Daily limit of ${env.DAILY_IMAGE_LIMIT} images reached`,
+        code: 'RATE_LIMIT_EXCEEDED',
+        redirect: '/subscription'
+      }, 429, headers);
     }
 
     console.log('Generating image with prompt:', prompt);

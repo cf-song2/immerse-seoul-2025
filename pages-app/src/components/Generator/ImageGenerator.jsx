@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Upload, Image, Loader2, Globe, Lock } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import api from '../../services/api';
 
 export default function ImageGenerator({ onGenerated }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [prompt, setPrompt] = useState('');
   const [negativePrompt, setNegativePrompt] = useState('');
   const [isPublic, setIsPublic] = useState(false);
@@ -35,7 +37,16 @@ export default function ImageGenerator({ onGenerated }) {
         onGenerated();
       }
     } catch (err) {
-      setError(err.message);
+      // Check if it's a rate limit error with redirect
+      if (err.response && err.response.data && err.response.data.code === 'RATE_LIMIT_EXCEEDED') {
+        // Show error message briefly, then redirect
+        setError(err.response.data.error);
+        setTimeout(() => {
+          navigate('/subscription');
+        }, 2000);
+      } else {
+        setError(err.message);
+      }
     } finally {
       setGenerating(false);
     }

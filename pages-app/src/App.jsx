@@ -7,6 +7,7 @@ import Register from './components/Auth/Register';
 import LegacyLogin from './components/Auth/LegacyLogin';
 import LegacyLoginSuccess from './components/Auth/LegacyLoginSuccess';
 import EmailVerify from './components/Auth/EmailVerify';
+import SubscriptionPage from './components/Subscription/SubscriptionPage';
 import ImageGenerator from './components/Generator/ImageGenerator';
 import ImageGallery from './components/Gallery/ImageGallery';
 
@@ -126,10 +127,13 @@ function AppContent() {
             <div className="flex items-center space-x-4">
               {user ? (
                 <>
-                  <span className="text-sm text-gray-600">
+                  <button
+                    onClick={() => navigate('/subscription')}
+                    className="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                  >
                     <User className="inline-block w-4 h-4 mr-1" />
                     {user.username}
-                  </span>
+                  </button>
                   <button
                     onClick={logout}
                     className="text-gray-600 hover:text-gray-900"
@@ -161,6 +165,7 @@ function AppContent() {
           } />
           <Route path="/gallery/:viewMode" element={<GalleryPage />} />
           <Route path="/verify" element={<EmailVerify />} />
+          <Route path="/subscription" element={<SubscriptionPage />} />
           <Route path="/legacy-login" element={
             <div className="max-w-2xl mx-auto">
               <div className="bg-white rounded-lg shadow-sm p-8">

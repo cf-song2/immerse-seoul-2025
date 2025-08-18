@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   is_active BOOLEAN DEFAULT 1,
   is_verified INTEGER DEFAULT 0,
-  verification_token TEXT
+  verification_token TEXT,
+  subscription_plan TEXT DEFAULT 'free'
 );
 
 -- Sessions table (backup for KV)
