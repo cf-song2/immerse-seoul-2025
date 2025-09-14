@@ -16,8 +16,8 @@ flowchart TD
     User[👤 User Browser] --> Pages
     
     subgraph CF[Cloudflare Edge Network]
-        Pages[📱 Pages<br/>React SPA Frontend<br/>immerse-seoul.pages.dev]
-        Worker[⚡ Workers API<br/>Backend Logic<br/>immerse-seoul-api.metamon.shop]
+        Pages[📱 Pages<br/>React SPA Frontend<br/>your-app.pages.dev]
+        Worker[⚡ Workers API<br/>Backend Logic<br/>your-worker.workers.dev]
     end
     
     Pages -->|API Calls| Worker
@@ -32,10 +32,10 @@ flowchart TD
     Worker --> APIs
     
     subgraph Services[Cloudflare Services]
-        AI[🤖 Workers AI<br/>Stable Diffusion XL<br/>@cf/stabilityai/stable-diffusion-xl-base-1.0]
-        R2[💾 R2 Storage<br/>Image Files<br/>ai-generated-images-auth]
+        AI[🤖 Workers AI<br/>Flux-1-Schnell (Premium)<br/>Stable Diffusion XL (Free)<br/>Llama-3-8B (Prompt Enhancement)]
+        R2[💾 R2 Storage<br/>Image Files<br/>your-bucket-name]
         D1[🗄️ D1 Database<br/>SQLite<br/>Users & Metadata]
-        KV[⚡ KV Store<br/>Sessions & Tokens<br/>SESSIONS namespace]
+        KV[⚡ KV Store<br/>Sessions & Tokens<br/>your-kv-namespace]
     end
     
     APIs --> AI
@@ -155,13 +155,14 @@ wrangler d1 execute image-metadata-auth --file=./schema.sql
 #### R2 Storage Bucket
 ```bash
 # Create R2 bucket for image storage
-wrangler r2 bucket create ai-generated-images-auth
+wrangler r2 bucket create your-bucket-name
 ```
 
 #### KV Namespace
 ```bash
-# Create KV namespace for sessions
+# Create KV namespace for sessions (save the ID from output)
 wrangler kv:namespace create "SESSIONS"
+# Output: { binding = "SESSIONS", id = "xyz789-your-kv-id" }
 ```
 
 ### 4. Configure Environment Variables
@@ -170,17 +171,23 @@ Update `wrangler.jsonc` with your resource IDs:
 
 ```jsonc
 {
+  "r2_buckets": [
+    {
+      "binding": "IMAGES_BUCKET",
+      "bucket_name": "your-bucket-name" // Replace with your bucket name
+    }
+  ],
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "image-metadata-auth",
-      "database_id": "YOUR_D1_DATABASE_ID" // Replace with actual ID
+      "database_id": "abc123-your-database-id" // Replace with actual ID from step 3
     }
   ],
   "kv_namespaces": [
     {
       "binding": "SESSIONS",
-      "id": "YOUR_KV_NAMESPACE_ID" // Replace with actual ID
+      "id": "xyz789-your-kv-id" // Replace with actual ID from step 3
     }
   ]
 }
@@ -223,8 +230,8 @@ wrangler pages deploy dist --project-name=immerse-seoul-frontend
 ### 7. Configure Custom Domains (Optional)
 
 Set up custom domains in your Cloudflare dashboard:
-- **API**: `immerse-seoul-api.metamon.shop` → Worker
-- **Frontend**: `immerse-seoul.metamon.shop` → Pages
+- **API**: `your-api-domain.com` → Worker
+- **Frontend**: `your-app-domain.com` → Pages
 
 ## 🌐 API Endpoints
 
