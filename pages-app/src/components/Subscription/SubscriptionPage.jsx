@@ -48,7 +48,7 @@ export default function SubscriptionPage() {
   const navigate = useNavigate();
   const [selectedPlan, setSelectedPlan] = useState(null);
 
-  const currentPlan = user?.subscription_plan || 'free';
+  const currentPlan = user?.plan || 'free';
 
   const handleUpgrade = (planId) => {
     setSelectedPlan(planId);

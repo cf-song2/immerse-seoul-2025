@@ -28,9 +28,9 @@ export async function authenticateRequest(request, env) {
 
     const sessionData = JSON.parse(session);
     
-    // Verify user exists
+    // Verify user exists and get plan
     const user = await env.DB.prepare(
-      'SELECT id, email, username FROM users WHERE id = ? AND is_active = 1'
+      'SELECT id, email, username, plan FROM users WHERE id = ? AND is_active = 1'
     ).bind(sessionData.userId).first();
 
     if (!user) {
@@ -42,7 +42,8 @@ export async function authenticateRequest(request, env) {
       user: {
         id: user.id,
         email: user.email,
-        username: user.username
+        username: user.username,
+        plan: (user.plan || 'free').toLowerCase()
       }
     };
   } catch (error) {

@@ -213,6 +213,6 @@ export async function handleVerifyAuth(request, env, ctx) {
   return jsonResponse({
     authenticated: true,
     user: request.user
-  }, 200, corsHeaders);
+  }, 200, headers);
 }
 

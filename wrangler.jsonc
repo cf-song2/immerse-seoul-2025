@@ -20,7 +20,7 @@
     {
       "binding": "DB",
       "database_name": "image-metadata-auth",
-      "database_id": "a6b7f38c-64ee-46d0-be85-d175fb527ad0"
+      "database_id": "YOUR_D1_DATABASE_ID"
     }
   ],
 
@@ -28,7 +28,7 @@
   "kv_namespaces": [
     {
       "binding": "SESSIONS",
-      "id": "ef3320e528484969b45db31c06153906"
+      "id": "YOUR_KV_NAMESPACE_ID"
     }
   ],
 
@@ -42,8 +42,8 @@
   // Custom domain routing
   "routes": [
     {
-      "pattern": "immerse-seoul-api.metamon.shop/*",
-      "zone_name": "metamon.shop"
+      "pattern": "immerse-seoul-api.metamon.shop",
+      "custom_domain": true
     }
   ]
 }

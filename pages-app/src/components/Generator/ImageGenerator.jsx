@@ -38,12 +38,9 @@ export default function ImageGenerator({ onGenerated }) {
       }
     } catch (err) {
       // Check if it's a rate limit error with redirect
-      if (err.response && err.response.data && err.response.data.code === 'RATE_LIMIT_EXCEEDED') {
-        // Show error message briefly, then redirect
-        setError(err.response.data.error);
-        setTimeout(() => {
-          navigate('/subscription');
-        }, 2000);
+      if (err.response && err.response.data && err.response.data.error === 'RATE_LIMIT_EXCEEDED') {
+        // Immediately redirect to subscription page
+        navigate('/subscription');
       } else {
         setError(err.message);
       }
@@ -120,6 +117,14 @@ export default function ImageGenerator({ onGenerated }) {
             </>
           )}
         </button>
+        
+        {user && (!user.plan || user.plan === '' || user.plan.toLowerCase() === 'free') && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-3">
+            <p className="text-sm text-blue-700 text-center">
+              <span className="text-blue-600">ℹ️</span> You're currently on the free plan. Upgrade to Enterprise for better image quality and unlimited image generation!
+            </p>
+          </div>
+        )}
 
         {!user && (
           <p className="text-sm text-gray-600 text-center">

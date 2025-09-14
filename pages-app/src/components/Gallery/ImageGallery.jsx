@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Image, Globe, Lock, Loader2 } from 'lucide-react';
+import { Image, Globe, Lock, Loader2, Trash2, AlertCircle, Shield } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import api from '../../services/api';
 
 export default function ImageGallery({ viewMode = 'my' }) {
+  const [deletingImageId, setDeletingImageId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+  
   function renderImage(image, blobVal, hasImg) {
     if (hasImg) {
       return (
@@ -33,6 +37,31 @@ export default function ImageGallery({ viewMode = 'my' }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageBlobs, setImageBlobs] = useState({});
 
+  const handleDeleteImage = async (imageId, e) => {
+    e.stopPropagation(); // Prevent opening the image modal
+    setDeletingImageId(imageId);
+    setIsDeleting(true);
+    setDeleteError('');
+    
+    try {
+      await api.deleteImage(imageId);
+      // Remove the deleted image from the state
+      setImages(prevImages => prevImages.filter(img => img.id !== imageId));
+      // Also remove from imageBlobs
+      setImageBlobs(prevBlobs => {
+        const newBlobs = {...prevBlobs};
+        delete newBlobs[imageId];
+        return newBlobs;
+      });
+    } catch (error) {
+      console.error('Failed to delete image:', error);
+      setDeleteError(error.message || 'Failed to delete image');
+    } finally {
+      setIsDeleting(false);
+      setDeletingImageId(null);
+    }
+  };
+  
   const fetchImages = useCallback(async () => {
     setLoading(true);
     try {
@@ -114,6 +143,21 @@ export default function ImageGallery({ viewMode = 'my' }) {
     );
   }
 
+  if (deleteError) {
+    return (
+      <div className="text-center py-6 bg-white rounded-lg mb-4">
+        <AlertCircle className="mx-auto h-8 w-8 text-red-500" />
+        <p className="mt-2 text-red-500">{deleteError}</p>
+        <button 
+          onClick={() => setDeleteError('')}
+          className="mt-2 px-4 py-1 bg-gray-200 rounded-md hover:bg-gray-300 text-sm"
+        >
+          Dismiss
+        </button>
+      </div>
+    );
+  }
+  
   if (images.length === 0) {
     return (
       <div className="text-center py-12 bg-white rounded-lg">
@@ -139,11 +183,30 @@ export default function ImageGallery({ viewMode = 'my' }) {
             >
               <div className="aspect-square relative">
                 {renderImage(image, blobVal, hasImg)}
-                {image.is_public ? (
-                  <div className="absolute top-2 right-2">
-                    <Globe className="w-5 h-5 text-white drop-shadow-lg" />
-                  </div>
-                ) : null}
+                <div className="absolute top-2 right-2 flex space-x-2">
+                  {image.is_public ? (
+                    <div className="p-1 bg-blue-500 bg-opacity-70 rounded-full">
+                      <Globe className="w-4 h-4 text-white drop-shadow-lg" />
+                    </div>
+                  ) : (
+                    <div className="p-1 bg-gray-500 bg-opacity-70 rounded-full">
+                      <Shield className="w-4 h-4 text-white drop-shadow-lg" />
+                    </div>
+                  )}
+                  {viewMode === 'my' && (
+                    <button 
+                      onClick={(e) => handleDeleteImage(image.id, e)}
+                      className="p-1 bg-red-500 bg-opacity-70 hover:bg-opacity-100 rounded-full transition-all"
+                      disabled={isDeleting && deletingImageId === image.id}
+                    >
+                      {isDeleting && deletingImageId === image.id ? (
+                        <Loader2 className="w-4 h-4 text-white animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4 text-white" />
+                      )}
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="p-3">
                 <p className="text-sm text-gray-700 line-clamp-2">{image.prompt ? image.prompt : ''}</p>

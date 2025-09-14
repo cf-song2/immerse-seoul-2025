@@ -7,7 +7,8 @@ import {
   handleImageGeneration, 
   handleGetUserImages, 
   handleGetPublicImages, 
-  handleGetImage 
+  handleGetImage,
+  handleDeleteImage
 } from './handlers/images.js';
 import { corsHeaders } from './utils/response.js';
 
@@ -78,6 +79,8 @@ export default {
         return await requireAuth(handleImageGeneration)(request, env, ctx);
       } else if (url.pathname === '/api/user/images' && request.method === 'GET') {
         return await requireAuth(handleGetUserImages)(request, env, ctx);
+      } else if (url.pathname === '/api/image/delete' && request.method === 'POST') {
+        return await requireAuth(handleDeleteImage)(request, env, ctx);
       }
 
       return new Response('Not Found', { status: 404 });

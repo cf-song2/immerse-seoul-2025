@@ -21,7 +21,9 @@ class ApiService {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Request failed');
+      const err = new Error(error.message || error.error || 'Request failed');
+      err.response = { data: error };
+      throw err;
     }
 
     return response.json();
@@ -68,6 +70,13 @@ class ApiService {
 
   getImageUrl(imageId) {
     return `${API_BASE}/image/${imageId}`;
+  }
+  
+  deleteImage(imageId) {
+    return this.request('/image/delete', { 
+      method: 'POST', 
+      body: JSON.stringify({ imageId }) 
+    });
   }
 }
 
