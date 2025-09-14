@@ -32,7 +32,7 @@ flowchart TD
     Worker --> APIs
     
     subgraph Services[Cloudflare Services]
-        AI[🤖 Workers AI<br/>Flux-1-Schnell (Premium)<br/>Stable Diffusion XL (Free)<br/>Llama-3-8B (Prompt Enhancement)]
+        AI[🤖 Workers AI<br/>Flux-1-Schnell Premium<br/>Stable Diffusion XL Free<br/>Llama-3-8B Prompt Enhancement]
         R2[💾 R2 Storage<br/>Image Files<br/>your-bucket-name]
         D1[🗄️ D1 Database<br/>SQLite<br/>Users & Metadata]
         KV[⚡ KV Store<br/>Sessions & Tokens<br/>your-kv-namespace]
