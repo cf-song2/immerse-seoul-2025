@@ -1,10 +1,12 @@
 import { hashPassword, verifyPassword, generateToken, generateUserId } from '../utils/crypto.js';
 import { createJWT, verifyJWT } from './jwt.js';
 import { jsonResponse, errorResponse, corsHeaders } from '../utils/response.js';
+import { getDynamicCorsHeaders } from '../utils/cors.js';
 
 export async function handleRegister(request, env) {
 
-  const headers = env.ENVIRONMENT === 'production' ? corsHeaders : devCorsHeaders;
+  const requestOrigin = request.headers.get('Origin');
+  const headers = getDynamicCorsHeaders(requestOrigin, env.ENVIRONMENT || 'development');
 
   try {
     const body = await request.json();
@@ -13,7 +15,7 @@ export async function handleRegister(request, env) {
     console.log('Register request:', { email, username });
 
     if (!email || !password || !username) {
-      return errorResponse('Missing required fields', 400, corsHeaders(env));
+      return errorResponse('Missing required fields', 400, headers);
     }
 
     // Check if user exists
@@ -82,21 +84,22 @@ export async function handleRegister(request, env) {
     return jsonResponse({ 
       success: true,
       message: 'Verification email sent. Please check your inbox.'
-    }, 200, corsHeaders);
+    }, 200, headers);
   } catch (error) {
-    return errorResponse('Registration failed', 500, corsHeaders(env));
+    return errorResponse('Registration failed', 500, headers);
   }
 }
 
 export async function handleLogin(request, env) {
-  const headers = env.ENVIRONMENT === 'production' ? corsHeaders : devCorsHeaders;
+  const requestOrigin = request.headers.get('Origin');
+  const headers = getDynamicCorsHeaders(requestOrigin, env.ENVIRONMENT || 'development');
   
   try {
     const body = await request.json();
     const { email, password } = body;
 
     if (!email || !password) {
-      return errorResponse('Missing credentials', 400, corsHeaders(env));
+      return errorResponse('Missing credentials', 400, headers);
     }
 
     // Find user
@@ -105,10 +108,10 @@ export async function handleLogin(request, env) {
     ).bind(email).first();
 
     if (!user || !(await verifyPassword(password, user.password_hash))) {
-      return errorResponse('Invalid credentials', 401, corsHeaders(env));
+      return errorResponse('Invalid credentials', 401, headers);
     }
     if (!user.is_verified) {
-      return errorResponse('Please verify your email before logging in.', 403, corsHeaders(env));
+      return errorResponse('Please verify your email before logging in.', 403, headers);
     }
 
     // Create session
@@ -145,15 +148,16 @@ export async function handleLogin(request, env) {
         email: user.email,
         username: user.username
       }
-    }, 200, corsHeaders);
+    }, 200, headers);
   } catch (error) {
-    return errorResponse('Login failed', 500, corsHeaders(env));
+    return errorResponse('Login failed', 500, headers);
   }
 }
 
 // Email verification endpoint
 export async function handleVerifyEmail(request, env) {
-  const headers = env.ENVIRONMENT === 'production' ? corsHeaders : devCorsHeaders;
+  const requestOrigin = request.headers.get('Origin');
+  const headers = getDynamicCorsHeaders(requestOrigin, env.ENVIRONMENT || 'development');
   try {
     const url = new URL(request.url);
     const token = url.searchParams.get('token');
@@ -191,7 +195,8 @@ export async function handleVerifyEmail(request, env) {
 }
 
 export async function handleLogout(request, env) {
-  const headers = env.ENVIRONMENT === 'production' ? corsHeaders : devCorsHeaders;
+  const requestOrigin = request.headers.get('Origin');
+  const headers = getDynamicCorsHeaders(requestOrigin, env.ENVIRONMENT || 'development');
 
   const authHeader = request.headers.get('Authorization');
   
@@ -204,11 +209,12 @@ export async function handleLogout(request, env) {
     }
   }
 
-  return jsonResponse({ success: true }, 200, corsHeaders(env));
+  return jsonResponse({ success: true }, 200, headers);
 }
 
 export async function handleVerifyAuth(request, env, ctx) {
-  const headers = env.ENVIRONMENT === 'production' ? corsHeaders : devCorsHeaders;
+  const requestOrigin = request.headers.get('Origin');
+  const headers = getDynamicCorsHeaders(requestOrigin, env.ENVIRONMENT || 'development');
 
   return jsonResponse({
     authenticated: true,

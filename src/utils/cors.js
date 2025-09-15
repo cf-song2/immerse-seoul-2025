@@ -26,8 +26,17 @@ export function getCorsHeaders(environment = 'development') {
 export function getDynamicCorsHeaders(requestOrigin, environment = 'development') {
   const domains = allowedDomains[environment] || allowedDomains.development;
   
+  // Debug logging
+  console.log('CORS Debug:', {
+    requestOrigin,
+    environment,
+    domains,
+    allowedDomainsConfig: allowedDomains
+  });
+  
   // If wildcard is allowed, return it
   if (domains.includes('*')) {
+    console.log('Using wildcard CORS');
     return {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -41,8 +50,16 @@ export function getDynamicCorsHeaders(requestOrigin, environment = 'development'
     (domain.startsWith('*.') && requestOrigin?.endsWith(domain.slice(1)))
   );
   
+  console.log('CORS Match Result:', {
+    allowedOrigin,
+    fallbackDomain: domains[0]
+  });
+  
+  // Always return a valid origin - if not found, use first domain as fallback
+  const finalOrigin = allowedOrigin || domains[0];
+  
   return {
-    'Access-Control-Allow-Origin': allowedOrigin || domains[0],
+    'Access-Control-Allow-Origin': finalOrigin,
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Credentials': 'true'

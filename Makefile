@@ -78,7 +78,7 @@ deploy:
 .PHONY: deploy-worker
 deploy-worker:
 	@echo "$(GREEN)Deploying worker to Cloudflare...$(NC)"
-	npx wrangler deploy
+	npx wrangler deploy --config wrangler.local.jsonc
 	@echo "$(GREEN)✓ Worker deployed$(NC)"
 
 

@@ -10,21 +10,15 @@ import {
   handleGetImage,
   handleDeleteImage
 } from './handlers/images.js';
-import { corsHeaders } from './utils/response.js';
+import { getDynamicCorsHeaders } from './utils/cors.js';
 
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // Dynamic CORS headers based on environment
-    const corsHeaders = {
-      'Access-Control-Allow-Origin': env.ENVIRONMENT === 'production' 
-        ? env.FRONTEND_URL
-        : env.DEV_FRONTEND_URL,
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Allow-Credentials': env.ENVIRONMENT === 'production' ? 'true' : 'false'
-    };
+    // Get request origin for dynamic CORS
+    const requestOrigin = request.headers.get('Origin');
+    const corsHeaders = getDynamicCorsHeaders(requestOrigin, env.ENVIRONMENT || 'development');
 
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
@@ -44,7 +38,7 @@ export default {
       } else if (url.pathname === '/api/auth/logout' && request.method === 'POST') {
         return await handleLogout(request, env);
       } else if (url.pathname === '/api/images' && request.method === 'GET') {
-        return await handleGetPublicImages(env);
+        return await handleGetPublicImages(request, env);
       } else if (url.pathname.startsWith('/api/image/') && request.method === 'GET') {
         return await handleGetImage(request, url.pathname, env);
       } else if (url.pathname === '/api/auth/verify-email' && request.method === 'GET') {
@@ -52,7 +46,7 @@ export default {
       }
 
       if (url.pathname === '/api/test' && request.method === 'GET') {
-        const headers = env.ENVIRONMENT === 'production' ? corsHeaders : devCorsHeaders;
+        const headers = corsHeaders;
   
         try {
     
