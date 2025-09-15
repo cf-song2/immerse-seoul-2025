@@ -9,21 +9,15 @@
   "env": {
     "production": {
       "vars": {
-        "VITE_API_URL": "YOUR_API_URL"
+        "VITE_API_URL": "YOUR_API_URL",
+        "NODE_ENV": "production"
       }
     },
     "preview": {
       "vars": {
-        "VITE_API_URL": "YOUR_API_URL"
+        "VITE_API_URL": "YOUR_API_URL",
+        "NODE_ENV": "development"
       }
     }
-  },
-  
-  // Custom domain routing for Pages
-  "routes": [
-    {
-      "pattern": "your-frontend-domain.com/*",
-      "zone_name": "your-domain.com"
-    }
-  ]
+  }
 }
