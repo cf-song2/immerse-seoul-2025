@@ -1,0 +1,12 @@
+{
+  "production": [
+    "https://immerse-seoul.metamon.shop",
+    "https://immerse-seoul-backup.metamon.shop"
+  ],
+  "development": [
+    "*"
+  ],
+  "preview": [
+    "https://immerse-seoul.metamon.shop"
+  ]
+}

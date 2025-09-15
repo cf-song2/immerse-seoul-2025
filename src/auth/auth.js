@@ -13,7 +13,7 @@ export async function handleRegister(request, env) {
     console.log('Register request:', { email, username });
 
     if (!email || !password || !username) {
-      return errorResponse('Missing required fields', 400, corsHeaders);
+      return errorResponse('Missing required fields', 400, corsHeaders(env));
     }
 
     // Check if user exists
@@ -84,7 +84,7 @@ export async function handleRegister(request, env) {
       message: 'Verification email sent. Please check your inbox.'
     }, 200, corsHeaders);
   } catch (error) {
-    return errorResponse('Registration failed', 500, corsHeaders);
+    return errorResponse('Registration failed', 500, corsHeaders(env));
   }
 }
 
@@ -96,7 +96,7 @@ export async function handleLogin(request, env) {
     const { email, password } = body;
 
     if (!email || !password) {
-      return errorResponse('Missing credentials', 400, corsHeaders);
+      return errorResponse('Missing credentials', 400, corsHeaders(env));
     }
 
     // Find user
@@ -105,10 +105,10 @@ export async function handleLogin(request, env) {
     ).bind(email).first();
 
     if (!user || !(await verifyPassword(password, user.password_hash))) {
-      return errorResponse('Invalid credentials', 401, corsHeaders);
+      return errorResponse('Invalid credentials', 401, corsHeaders(env));
     }
     if (!user.is_verified) {
-      return errorResponse('Please verify your email before logging in.', 403, corsHeaders);
+      return errorResponse('Please verify your email before logging in.', 403, corsHeaders(env));
     }
 
     // Create session
@@ -147,7 +147,7 @@ export async function handleLogin(request, env) {
       }
     }, 200, corsHeaders);
   } catch (error) {
-    return errorResponse('Login failed', 500, corsHeaders);
+    return errorResponse('Login failed', 500, corsHeaders(env));
   }
 }
 
@@ -204,7 +204,7 @@ export async function handleLogout(request, env) {
     }
   }
 
-  return jsonResponse({ success: true }, 200, corsHeaders);
+  return jsonResponse({ success: true }, 200, corsHeaders(env));
 }
 
 export async function handleVerifyAuth(request, env, ctx) {
