@@ -1,23 +1,7 @@
 {
-  "$schema": "../node_modules/wrangler/config-schema.json",
-  
-  "name": "immerse-seoul-frontend",
-  "compatibility_date": "2025-07-22",
-  
-  "pages_build_output_dir": "dist",
-  
-  "env": {
-    "production": {
-      "vars": {
-        "VITE_API_URL": "YOUR_API_URL",
-        "NODE_ENV": "production"
-      }
-    },
-    "preview": {
-      "vars": {
-        "VITE_API_URL": "YOUR_API_URL",
-        "NODE_ENV": "development"
-      }
-    }
+    "$schema": "../node_modules/wrangler/config-schema.json",
+    "name": "immerse-seoul-frontend",
+    "compatibility_date": "2025-07-22",
+    "pages_build_output_dir": "dist"
   }
-}
+  
