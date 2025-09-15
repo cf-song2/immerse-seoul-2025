@@ -174,5 +174,6 @@ wrangler.local.jsonc
 
 # Local configuration files
 pages-app/.env.production.local
+pages-app/wrangler.local.jsonc
 
 immerse-seoul.drawio

@@ -1,4 +1,5 @@
 // Response helper utilities
+import { getCorsHeaders } from './cors.js';
 
 export function jsonResponse(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
@@ -14,10 +15,10 @@ export function errorResponse(message, status = 400, headers = {}) {
   return jsonResponse({ error: message }, status, headers);
 }
 
-// Note: CORS headers are set dynamically in workers.js based on environment
+// Dynamic CORS headers based on environment
+export function corsHeaders(env) {
+  return getCorsHeaders(env?.ENVIRONMENT || 'development');
+}
 
-export const devCorsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+// Legacy exports for backward compatibility
+export const devCorsHeaders = getCorsHeaders('development');

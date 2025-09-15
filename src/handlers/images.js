@@ -1,8 +1,10 @@
 // Image handling functions
 import { jsonResponse, errorResponse, corsHeaders, devCorsHeaders } from '../utils/response.js';
+import { getDynamicCorsHeaders } from '../utils/cors.js';
 
 export async function handleImageGeneration(request, env, ctx) {
-  const headers = env.ENVIRONMENT === 'production' ? corsHeaders : devCorsHeaders;
+  const requestOrigin = request.headers.get('Origin');
+  const headers = getDynamicCorsHeaders(requestOrigin, env.ENVIRONMENT || 'development');
 
   try {
     const body = await request.json();
@@ -396,7 +398,8 @@ export async function handleImageGeneration(request, env, ctx) {
 }
 
 export async function handleGetUserImages(request, env, ctx) {
-  const headers = env.ENVIRONMENT === 'production' ? corsHeaders : devCorsHeaders;
+  const requestOrigin = request.headers.get('Origin');
+  const headers = getDynamicCorsHeaders(requestOrigin, env.ENVIRONMENT || 'development');
 
   try {
     const { results } = await env.DB.prepare(
@@ -409,8 +412,9 @@ export async function handleGetUserImages(request, env, ctx) {
   }
 }
 
-export async function handleGetPublicImages(env) {
-  const headers = env.ENVIRONMENT === 'production' ? corsHeaders : devCorsHeaders;
+export async function handleGetPublicImages(request, env) {
+  const requestOrigin = request.headers.get('Origin');
+  const headers = getDynamicCorsHeaders(requestOrigin, env.ENVIRONMENT || 'development');
 
   try {
     const { results } = await env.DB.prepare(
@@ -429,7 +433,8 @@ export async function handleGetPublicImages(env) {
 }
 
 export async function handleDeleteImage(request, env, ctx) {
-  const headers = env.ENVIRONMENT === 'production' ? corsHeaders : devCorsHeaders;
+  const requestOrigin = request.headers.get('Origin');
+  const headers = getDynamicCorsHeaders(requestOrigin, env.ENVIRONMENT || 'development');
   
   try {
     // Get image details to verify ownership
@@ -471,7 +476,8 @@ export async function handleDeleteImage(request, env, ctx) {
 }
 
 export async function handleGetImage(request, pathname, env) {
-  const headers = env.ENVIRONMENT === 'production' ? corsHeaders : devCorsHeaders;
+  const requestOrigin = request.headers.get('Origin');
+  const headers = getDynamicCorsHeaders(requestOrigin, env.ENVIRONMENT || 'development');
   
   const imageId = pathname.split('/').pop();
   
