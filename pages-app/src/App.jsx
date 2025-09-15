@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation, useParams } from 'react-router-dom';
-import { Upload, Grid, LogIn, LogOut, User, Loader2, Shield } from 'lucide-react';
+import { Upload, Grid, LogIn, LogOut, User, Loader2, Shield, MessageCircle } from 'lucide-react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
@@ -10,6 +10,7 @@ import EmailVerify from './components/Auth/EmailVerify';
 import SubscriptionPage from './components/Subscription/SubscriptionPage';
 import ImageGenerator from './components/Generator/ImageGenerator';
 import ImageGallery from './components/Gallery/ImageGallery';
+import ChatInterface from './components/Chat/ChatInterface';
 
 // Gallery Page Component with URL routing
 function GalleryPage() {
@@ -112,6 +113,17 @@ function AppContent() {
                   Finder
                 </Link>
                 <Link
+                  to="/chat"
+                  className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                    location.pathname === '/chat' 
+                      ? 'bg-purple-100 text-purple-700' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <MessageCircle className="inline-block w-4 h-4 mr-2" />
+                  AI Chat
+                </Link>
+                <Link
                   to="/legacy-login"
                   className={`px-4 py-2 rounded-md font-medium transition-colors ${
                     location.pathname === '/legacy-login' 
@@ -164,6 +176,7 @@ function AppContent() {
             </div>
           } />
           <Route path="/gallery/:viewMode" element={<GalleryPage />} />
+          <Route path="/chat" element={<ChatInterface />} />
           <Route path="/verify" element={<EmailVerify />} />
           <Route path="/subscription" element={<SubscriptionPage />} />
           <Route path="/legacy-login" element={
