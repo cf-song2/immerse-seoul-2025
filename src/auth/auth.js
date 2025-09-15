@@ -181,7 +181,7 @@ export async function handleVerifyEmail(request, env) {
     return jsonResponse({ 
       success: true, 
       message: 'Email verified successfully! You can now log in.',
-      redirect: 'https://immerse-seoul.metamon.shop/login?verified=true'
+      redirect: `${env.ENVIRONMENT === 'production' ? env.FRONTEND_URL : env.DEV_FRONTEND_URL}/login?verified=true`
     }, 200, headers);
   } catch (error) {
     console.error('Email verification error:', error);

@@ -36,13 +36,15 @@
     "SESSION_DURATION": "86400",
     "DAILY_IMAGE_LIMIT": "10",
     "ENVIRONMENT": "production",
-    "EMAIL_FROM": "onboarding@resend.dev"
+    "EMAIL_FROM": "onboarding@resend.dev",
+    "FRONTEND_URL": "YOUR_FRONTEND_URL",
+    "DEV_FRONTEND_URL": "http://localhost:5173"
   },
 
   // Custom domain routing
   "routes": [
     {
-      "pattern": "immerse-seoul-api.metamon.shop",
+      "pattern": "your-api-domain.com",
       "custom_domain": true
     }
   ]

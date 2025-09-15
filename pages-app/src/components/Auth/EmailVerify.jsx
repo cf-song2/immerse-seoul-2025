@@ -22,7 +22,7 @@ export default function EmailVerify() {
         }
 
         // Call the API endpoint directly with the token
-        const response = await fetch(`https://immerse-seoul-api.metamon.shop/api/auth/verify-email?token=${token}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/verify-email?token=${token}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

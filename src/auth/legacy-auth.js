@@ -39,8 +39,8 @@ export async function handleLegacyLogin(request, env) {
     ).bind(email).first();
 
     const frontendUrl = env.ENVIRONMENT === 'production' 
-      ? 'https://immerse-seoul.metamon.shop' 
-      : 'http://localhost:5173';
+      ? env.FRONTEND_URL
+      : env.DEV_FRONTEND_URL;
 
     if (!user || !(await verifyPassword(password, user.password_hash))) {
       const errorUrl = `${frontendUrl}/legacy-login?error=${encodeURIComponent('Invalid credentials')}`;

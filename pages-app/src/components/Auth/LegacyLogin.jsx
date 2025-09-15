@@ -41,7 +41,7 @@ export default function LegacyLogin({ onSuccess }) {
       </div>
 
       <form 
-        action="https://immerse-seoul-api.metamon.shop/auth/legacy-login" 
+        action={`${import.meta.env.VITE_API_URL}/auth/legacy-login`} 
         method="POST" 
         onSubmit={handleSubmit} 
         className="space-y-4"

@@ -16,7 +16,15 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    const headers = env.ENVIRONMENT === 'production' ? corsHeaders : devCorsHeaders;
+    // Dynamic CORS headers based on environment
+    const corsHeaders = {
+      'Access-Control-Allow-Origin': env.ENVIRONMENT === 'production' 
+        ? env.FRONTEND_URL
+        : env.DEV_FRONTEND_URL,
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Credentials': env.ENVIRONMENT === 'production' ? 'true' : 'false'
+    };
 
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {

@@ -10,7 +10,7 @@ export async function sendVerificationEmail(to, token, env) {
     return false;
   }
   
-  const verificationUrl = `https://immerse-seoul.metamon.shop/verify?token=${token}`;
+  const verificationUrl = `${env.ENVIRONMENT === 'production' ? env.FRONTEND_URL : env.DEV_FRONTEND_URL}/verify?token=${token}`;
   
   const emailHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

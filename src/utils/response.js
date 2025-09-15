@@ -14,12 +14,7 @@ export function errorResponse(message, status = 400, headers = {}) {
   return jsonResponse({ error: message }, status, headers);
 }
 
-export const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://immerse-seoul.metamon.shop',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Access-Control-Allow-Credentials': 'true'
-};
+// Note: CORS headers are set dynamically in workers.js based on environment
 
 export const devCorsHeaders = {
   'Access-Control-Allow-Origin': '*',
