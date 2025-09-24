@@ -2,5 +2,18 @@
     "$schema": "../node_modules/wrangler/config-schema.json",
     "name": "immerse-seoul-frontend",
     "compatibility_date": "2025-07-22",
-    "pages_build_output_dir": "dist"
+    
+    // ---- Assets Configuration for Workers ----
+    "assets": {
+        "directory": "./dist/",
+        "not_found_handling": "single-page-application"
+    },
+
+    // ---- Custom Domain ----
+    "routes": [
+        {
+            "pattern": "immerse-seoul.metamon.shop",
+            "custom_domain": true
+        }
+    ]
 }

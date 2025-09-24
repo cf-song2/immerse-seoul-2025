@@ -150,6 +150,14 @@ export async function handleLogin(request, env) {
       }
     }, 200, headers);
   } catch (error) {
+    console.error('Login error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      hasJWTSecret: !!env.JWT_SECRET,
+      hasDB: !!env.DB,
+      hasSessions: !!env.SESSIONS
+    });
     return errorResponse('Login failed', 500, headers);
   }
 }

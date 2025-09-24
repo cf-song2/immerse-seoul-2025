@@ -24,9 +24,10 @@ help:
 	@echo "  make dev-frontend - Run frontend only (port 5173)"
 	@echo ""
 	@echo "$(YELLOW)Deploy:$(NC)"
-	@echo "  make deploy       - Deploy both worker and frontend"
-	@echo "  make deploy-worker - Deploy worker only"
-	@echo "  make deploy-pages - Deploy frontend to Pages"
+	@echo "  make deploy       - Build frontend and deploy both Workers"
+	@echo "  make deploy-backend - Deploy backend Worker only"
+	@echo "  make deploy-frontend - Deploy frontend Worker only"
+	@echo "  make build-frontend - Build frontend assets only"
 	@echo ""
 	@echo "$(YELLOW)Database:$(NC)"
 	@echo "  make db-init      - Initialize database schema"
@@ -66,28 +67,38 @@ dev-frontend:
 	cd $(PAGES_DIR) && npm run dev
 
 
-# Deploy everything
+# Deploy everything (build frontend + deploy both workers)
 .PHONY: deploy
 deploy:
-	@echo "$(GREEN)Deploying worker and frontend...$(NC)"
-	@make deploy-worker
-	@make deploy-pages
+	@echo "$(GREEN)Building frontend and deploying both Workers...$(NC)"
+	@make build-frontend
+	@make deploy-backend
+	@make deploy-frontend
 	@echo "$(GREEN)✓ Deployment complete$(NC)"
 
-# Deploy worker only
-.PHONY: deploy-worker
-deploy-worker:
-	@echo "$(GREEN)Deploying worker to Cloudflare...$(NC)"
+# Deploy backend worker only
+.PHONY: deploy-backend
+deploy-backend:
+	@echo "$(GREEN)Deploying backend Worker to Cloudflare...$(NC)"
 	npx wrangler deploy --config wrangler.local.jsonc
-	@echo "$(GREEN)✓ Worker deployed$(NC)"
+	@echo "$(GREEN)✓ Backend Worker deployed$(NC)"
+
+# Deploy frontend worker only
+.PHONY: deploy-frontend
+deploy-frontend:
+	@echo "$(GREEN)Deploying frontend Worker to Cloudflare...$(NC)"
+	cd $(PAGES_DIR) && npx wrangler deploy
+	@echo "$(GREEN)✓ Frontend Worker deployed$(NC)"
 
 
-# Deploy frontend to Pages
-.PHONY: deploy-pages
-deploy-pages:
-	@echo "$(GREEN)Deploying frontend to Cloudflare Pages...$(NC)"
-	cd $(PAGES_DIR) && npx wrangler pages deploy
-	@echo "$(GREEN)✓ Frontend deployed to Pages$(NC)"
+# Build frontend assets
+.PHONY: build-frontend
+build-frontend:
+	@echo "$(GREEN)Building frontend assets...$(NC)"
+	cd $(PAGES_DIR) && npm run build
+	@echo "$(GREEN)Copying .assetsignore to dist directory...$(NC)"
+	cp $(PAGES_DIR)/.assetsignore $(PAGES_DIR)/dist/.assetsignore 2>/dev/null || true
+	@echo "$(GREEN)✓ Frontend built$(NC)"
 
 
 # Database initialization

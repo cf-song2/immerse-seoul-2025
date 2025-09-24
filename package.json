@@ -3,7 +3,10 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"deploy": "wrangler deploy",
+		"build": "cd pages-app && npm run build",
+		"deploy": "npm run build && wrangler deploy --config wrangler.local.jsonc && cd pages-app && wrangler deploy",
+		"deploy-backend": "wrangler deploy --config wrangler.local.jsonc",
+		"deploy-frontend": "npm run build && cd pages-app && wrangler deploy",
 		"dev": "wrangler dev",
 		"start": "wrangler dev",
 		"test": "vitest"
